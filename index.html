@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAANGPrep Studio // Algorithm Visualizer & Live Interview Environment</title>
+  <meta name="description" content="Production-grade FAANG coding interview platform, algorithmic documentary library, and step-by-step interactive algorithm visualizer.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-cyberpunk">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header id="main-header" class="site-header">
+    <div class="header-left">
+      <div class="brand-container">
+        <div class="brand-icon-wrapper">
+          <svg class="brand-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="url(#cyber-grad-1)"/>
+            <polyline points="2 17 12 22 22 17" stroke="url(#cyber-grad-1)"/>
+            <polyline points="2 12 12 17 22 12" stroke="url(#cyber-grad-2)"/>
+            <defs>
+              <linearGradient id="cyber-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00f2fe"/>
+                <stop offset="100%" stop-color="#4facfe"/>
+              </linearGradient>
+              <linearGradient id="cyber-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7f00ff"/>
+                <stop offset="100%" stop-color="#e100ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">FAANG<span class="highlight">PREP</span> <span class="badge-studio">STUDIO</span></div>
+          <div class="brand-sub">Algorithmic Visualizer & Interview Simulator</div>
+        </div>
+      </div>
+
+      <!-- Problem Quick Selector -->
+      <div class="problem-dropdown-wrapper">
+        <label for="problem-selector" class="sr-only">Select Problem</label>
+        <select id="problem-selector" class="glass-select" title="Choose from Curated FAANG Problems">
+          <!-- Populated dynamically by app.js -->
+        </select>
+      </div>
+
+      <!-- Import Custom Problems Button (For the user's 3500 list) -->
+      <button id="btn-open-importer" class="btn-import-gemini" title="Import question & solution from Gemini chat">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Import From Gemini (3500 List)</span>
+      </button>
+    </div>
+
+    <!-- Company Interview Persona Tabs -->
+    <div class="company-targets-bar">
+      <span class="company-label">TARGET:</span>
+      <button class="company-btn active" data-company="google" id="company-google">
+        <span class="company-dot google"></span> Google
+      </button>
+      <button class="company-btn" data-company="meta" id="company-meta">
+        <span class="company-dot meta"></span> Meta
+      </button>
+      <button class="company-btn" data-company="amazon" id="company-amazon">
+        <span class="company-dot amazon"></span> Amazon
+      </button>
+      <button class="company-btn" data-company="apple" id="company-apple">
+        <span class="company-dot apple"></span> Apple
+      </button>
+      <button class="company-btn" data-company="netflix" id="company-netflix">
+        <span class="company-dot netflix"></span> Netflix
+      </button>
+    </div>
+
+    <!-- Right Controls / Telemetry -->
+    <div class="header-right">
+      <div class="telemetry-badge" id="backend-status-badge" title="GCP Vertex AI Backend Connected">
+        <span class="pulse-indicator"></span>
+        <span class="telemetry-text">Vertex AI Gemini 3.8</span>
+      </div>
+      
+      <button id="btn-toggle-interviewer" class="btn-interviewer-dock active" title="Toggle FAANG Mock Interviewer Drawer">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span>Interviewer Dock</span>
+      </button>
+
+      <button id="btn-sound-toggle" class="btn-icon" title="Toggle Audio Feedback" aria-label="Toggle sound">
+        <span id="sound-icon">🔊</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE LAYOUT -->
+  <main id="app-workspace" class="workspace-container">
+    
+    <!-- LEFT PANE: PROBLEM STATEMENT & DOCUMENTARY DEEP-DIVE -->
+    <section id="pane-problem-doc" class="workspace-pane pane-left">
+      <div class="pane-header-tabs">
+        <button class="pane-tab active" data-target="tab-problem-content" id="tab-btn-problem">
+          <span>Problem Statement</span>
+        </button>
+        <button class="pane-tab" data-target="tab-documentary-content" id="tab-btn-doc">
+          <span>Architecture Documentary</span>
+          <span class="tab-chip">Deep Dive</span>
+        </button>
+        <button class="pane-tab" data-target="tab-interview-rubric" id="tab-btn-rubric">
+          <span>FAANG Rubric & Traps</span>
+        </button>
+      </div>
+
+      <!-- Problem Statement Tab -->
+      <div id="tab-problem-content" class="pane-body-tab active">
+        <div class="problem-meta-card">
+          <div class="meta-row-top">
+            <span id="prob-difficulty-badge" class="badge-difficulty medium">Medium</span>
+            <span id="prob-category-badge" class="badge-category">Arrays & Two Pointers</span>
+            <span id="prob-id-badge" class="badge-id">#0011</span>
+          </div>
+          <h1 id="prob-title" class="prob-heading">Container With Most Water</h1>
+          <div class="meta-companies" id="prob-companies-container">
+            <span class="company-tag">Google (48 asks)</span>
+            <span class="company-tag">Meta (36 asks)</span>
+            <span class="company-tag">Amazon (62 asks)</span>
+          </div>
+        </div>
+
+        <div id="prob-description-text" class="problem-description-content">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div class="problem-examples-section">
+          <h3>Standard Test Cases & Constraints</h3>
+          <div id="prob-examples-container">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentary Tab (Deep Algorithmic Analysis) -->
+      <div id="tab-documentary-content" class="pane-body-tab">
+        <div class="doc-header-card">
+          <div class="doc-badge-pill">PRINCIPAL ARCHITECT DOCUMENTARY</div>
+          <h2 id="doc-title">Mathematical Invariants & Cache Locality</h2>
+          <p id="doc-subtitle">Why Two-Pointers dominates brute force without violating optimal state search.</p>
+        </div>
+        <div id="doc-body-content" class="documentary-content-stream">
+          <!-- Populated dynamically by documentary.js -->
+        </div>
+      </div>
+
+      <!-- FAANG Rubric & Traps Tab -->
+      <div id="tab-interview-rubric" class="pane-body-tab">
+        <div class="rubric-container" id="rubric-body-content">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANE: INTERACTIVE ALGORITHM VISUALIZER -->
+    <section id="pane-visualizer" class="workspace-pane pane-center">
+      <div class="visualizer-header">
+        <div class="viz-header-title">
+          <div class="viz-indicator"></div>
+          <h2>ALGORITHM STATE MACHINE VISUALIZER</h2>
+        </div>
+        <div class="viz-quick-stats">
+          <span class="stat-item"><span class="stat-label">Comparisons:</span> <strong id="stat-comparisons">0</strong></span>
+          <span class="stat-item"><span class="stat-label">Operations:</span> <strong id="stat-swaps">0</strong></span>
+          <span class="stat-item"><span class="stat-label">Step:</span> <strong id="stat-step-num">0 / 0</strong></span>
+        </div>
+      </div>
+
+      <!-- Visualization Stage / Canvas Viewport -->
+      <div id="viz-stage-viewport" class="visualizer-viewport">
+        <!-- Interactive DOM Array/Tree/Pointer elements injected here -->
+        <div id="viz-container" class="viz-canvas-area"></div>
+        
+        <!-- Live Step Explanation Overlay -->
+        <div id="viz-step-callout" class="viz-explanation-card">
+          <div class="callout-icon">💡</div>
+          <div class="callout-body">
+            <div class="callout-phase" id="callout-phase">INITIAL STATE</div>
+            <div class="callout-text" id="callout-text">Initialize pointers at left boundary (index 0) and right boundary (index N-1).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visualizer Playback Control Toolbar -->
+      <div class="viz-control-dock">
+        <div class="playback-buttons">
+          <button id="btn-viz-restart" class="viz-btn" title="Restart Simulation (Home)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button id="btn-viz-prev" class="viz-btn" title="Step Backward (Left Arrow)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+          </button>
+          <button id="btn-viz-play" class="viz-btn btn-play-main" title="Play / Pause (Spacebar)">
+            <svg id="icon-play" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <svg id="icon-pause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <button id="btn-viz-next" class="viz-btn" title="Step Forward (Right Arrow)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+          </button>
+        </div>
+
+        <!-- Custom Input Bar -->
+        <div class="viz-input-group">
+          <label for="custom-input-array" class="input-label">Custom Input:</label>
+          <input type="text" id="custom-input-array" class="glass-input" value="[1, 8, 6, 2, 5, 4, 8, 3, 7]" placeholder="e.g. [1, 8, 6, 2, 5, 4, 8, 3, 7]" title="Enter custom array or input">
+          <button id="btn-apply-custom-input" class="btn-secondary-sm">Apply & Reset</button>
+        </div>
+
+        <!-- Speed Selector -->
+        <div class="speed-slider-group">
+          <label for="viz-speed-range" class="speed-label">Speed: <span id="speed-label-val">1.0x</span></label>
+          <input type="range" id="viz-speed-range" min="0.25" max="3" step="0.25" value="1">
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: INTEGRATED CODE STUDIO & RUNNER -->
+    <section id="pane-code-studio" class="workspace-pane pane-right">
+      <div class="editor-header">
+        <div class="editor-meta">
+          <span class="editor-dot"></span>
+          <span class="editor-title">CODE STUDIO</span>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="editor-controls-bar">
+          <label for="language-selector" class="sr-only">Programming Language</label>
+          <select id="language-selector" class="glass-select-sm" title="Choose Language">
+            <option value="python">Python 3 (CPython 3.12)</option>
+            <option value="cpp">C++ 20 (GCC 14)</option>
+            <option value="java">Java 21 (OpenJDK)</option>
+            <option value="javascript">TypeScript / JavaScript</option>
+          </select>
+
+          <button id="btn-reset-code" class="btn-icon-sm" title="Reset starter code">↺</button>
+        </div>
+      </div>
+
+      <!-- Code Editor Area -->
+      <div class="editor-body">
+        <div class="editor-gutter" id="editor-gutter">
+          <!-- Line numbers populated dynamically -->
+        </div>
+        <textarea id="code-editor-textarea" class="code-editor-input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="editor-footer-toolbar">
+        <div class="footer-left">
+          <span class="shortcut-tip"><kbd>Ctrl</kbd> + <kbd>Enter</kbd> to Run</span>
+        </div>
+        <div class="footer-actions">
+          <button id="btn-request-hint" class="btn-hint" title="Ask interviewer for guidance without penalty">
+            💡 Request Hint
+          </button>
+          <button id="btn-run-code" class="btn-run" title="Run code against test cases">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Run Code</span>
+          </button>
+          <button id="btn-submit-code" class="btn-submit" title="Submit to FAANG Interview Evaluation">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Submit Solution</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Test Cases & Output Console Tabs -->
+      <div class="console-drawer" id="console-drawer">
+        <div class="console-tabs-bar">
+          <button class="console-tab active" data-tab="tab-testcases" id="tab-btn-tests">Test Cases</button>
+          <button class="console-tab" data-tab="tab-terminal-log" id="tab-btn-console">Terminal & Output</button>
+          <button class="console-tab" data-tab="tab-complexity-report" id="tab-btn-complexity">Complexity Auditor</button>
+        </div>
+
+        <div id="tab-testcases" class="console-tab-content active">
+          <div class="testcase-chips" id="testcase-chips-list">
+            <!-- Chips: Case 1, Case 2, Custom Case -->
+          </div>
+          <div id="active-testcase-detail" class="testcase-detail-view">
+            <!-- Injected by editor.js -->
+          </div>
+        </div>
+
+        <div id="tab-terminal-log" class="console-tab-content">
+          <pre id="terminal-output" class="terminal-view">> System Ready. Click 'Run Code' or press Ctrl+Enter to execute.</pre>
+        </div>
+
+        <div id="tab-complexity-report" class="console-tab-content">
+          <div class="complexity-auditor-grid" id="complexity-auditor-card">
+            <div class="metric-box">
+              <span class="m-label">Time Complexity</span>
+              <span class="m-val success" id="auditor-time">O(N)</span>
+              <span class="m-sub">Optimal Single Pass</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">Space Complexity</span>
+              <span class="m-val success" id="auditor-space">O(1)</span>
+              <span class="m-sub">Zero In-Memory Allocation</span>
+            </div>
+            <div class="metric-box">
+              <span class="m-label">FAANG Benchmark</span>
+              <span class="m-val" id="auditor-score">98.4%</span>
+              <span class="m-sub">Beats candidate baseline</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DOCKABLE FAANG INTERVIEWER DRAWER -->
+    <aside id="interviewer-drawer" class="interviewer-drawer-container">
+      <div class="interviewer-drawer-header">
+        <div class="interviewer-profile">
+          <div class="avatar-ring" id="interviewer-avatar">
+            <span class="avatar-initials">AR</span>
+            <span class="status-dot-online"></span>
+          </div>
+          <div class="interviewer-info">
+            <div class="interviewer-name" id="interviewer-name">Alex Rivera</div>
+            <div class="interviewer-role" id="interviewer-title">Staff Software Engineer (L6) // Google Cloud</div>
+          </div>
+        </div>
+        <button id="btn-close-interviewer" class="btn-icon-xs" title="Minimize drawer">✕</button>
+      </div>
+
+      <!-- Live Chat Transcript Stream -->
+      <div class="interviewer-transcript" id="interview-transcript-area">
+        <!-- Messages injected dynamically -->
+      </div>
+
+      <!-- Quick Candidate Action Chips -->
+      <div class="interviewer-quick-prompts">
+        <button class="quick-chip" data-action="explain">🗣️ Explain Strategy</button>
+        <button class="quick-chip" data-action="clarify">❓ Clarify Constraints</button>
+        <button class="quick-chip" data-action="scale">🚀 How to Scale to 10B items?</button>
+        <button class="quick-chip" data-action="edge">⚠️ Edge Cases</button>
+      </div>
+
+      <!-- Candidate Input Box -->
+      <div class="interviewer-input-bar">
+        <input type="text" id="candidate-message-input" class="interviewer-input" placeholder="Type response to interviewer..." autocomplete="off">
+        <button id="btn-send-message" class="btn-send-interviewer" title="Send response (Enter)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="3 12 21 3 14 12 21 21 3 12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- MODAL: IMPORT FROM GEMINI CHAT (FOR USER'S 3,500 PROBLEMS) -->
+  <div id="modal-importer" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-pill">DIRECT GEMINI INTEGRATION</div>
+          <h2>Import Problem & Solution from Gemini Chat</h2>
+        </div>
+        <button id="btn-close-importer" class="btn-icon-close">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-instruction">
+          Paste the problem text, question, or complete solution code from your Gemini chat. Our parsing engine will auto-detect test cases, generate the step-by-step algorithm visualizer, and configure the FAANG mock interviewer!
+        </p>
+
+        <div class="form-group">
+          <label for="import-title">Problem Title / Number</label>
+          <input type="text" id="import-title" class="glass-input" placeholder="e.g. 3Sum, Trapping Rain Water, or LRU Cache">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="import-difficulty">Difficulty</label>
+            <select id="import-difficulty" class="glass-select">
+              <option value="Easy">Easy</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          <div class="form-group half">
+            <label for="import-category">Category</label>
+            <select id="import-category" class="glass-select">
+              <option value="Two Pointers">Two Pointers</option>
+              <option value="Sliding Window">Sliding Window</option>
+              <option value="Binary Search">Binary Search</option>
+              <option value="Dynamic Programming">Dynamic Programming</option>
+              <option value="Trees & Graphs">Trees & Graphs</option>
+              <option value="Stack & Monotonic Queue">Stack & Monotonic Queue</option>
+              <option value="Concurrency / System Design">Concurrency / Low-Latency</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="import-description">Question & Problem Description</label>
+          <textarea id="import-description" class="glass-textarea" rows="4" placeholder="Paste the problem statement, constraints, and test examples here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="import-solution">Solution Code (Python / C++ / Java / JS)</label>
+          <textarea id="import-solution" class="glass-textarea code-font" rows="5" placeholder="Paste your solution code here..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="import-visualizer-data">Sample Array / Input for Visualizer</label>
+          <input type="text" id="import-visualizer-data" class="glass-input" placeholder="e.g. [-1, 0, 1, 2, -1, -4] or [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel-import" class="btn-secondary">Cancel</button>
+        <button id="btn-confirm-import" class="btn-primary-glow">
+          ⚡ Parse & Launch into FAANG Studio
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio elements for high-end micro-interactions -->
+  <audio id="audio-click" preload="auto" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
+
+  <!-- Core Scripts -->
+  <script src="visualizer.js"></script>
+  <script src="documentary.js"></script>
+  <script src="editor.js"></script>
+  <script src="interviewer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
